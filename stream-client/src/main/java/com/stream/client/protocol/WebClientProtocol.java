@@ -15,6 +15,6 @@ public interface WebClientProtocol {
     @GetMapping(value = "/flux_ex", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     Flux<String> fluxEx();
 
-    @GetMapping(value = "/mono_ex")
-    Mono<IntegrationRes<String>> monoEx();
+    @GetMapping(value = "/mono")
+    Mono<IntegrationRes<String>> mono();
 }

@@ -72,15 +72,10 @@ public class DemoController {
         return result;
     }
 
-    @GetMapping(value = "/mono_ex")
-    public Mono<IntegrationRes<String>> monoEx() {
+    @GetMapping(value = "/mono")
+    public Mono<IntegrationRes<String>> mono() {
         IntegrationRes integrationRes = new IntegrationRes();
         integrationRes.setData("test");
-
-        if (1 == 1) {
-            throw new RuntimeException("test error");
-        }
-
         return Mono.just(integrationRes);
     }
 }

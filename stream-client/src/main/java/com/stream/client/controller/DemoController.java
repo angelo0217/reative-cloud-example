@@ -61,7 +61,7 @@ public class DemoController {
         return demoWebClient.fluxEx();
     }
 
-    @GetMapping(value = "/mono_ex", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/mono_ex")
     public Mono<IntegrationRes<String>> testMonoEx(){
         return demoWebClient.monoEx();
     }
