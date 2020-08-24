@@ -1,0 +1,78 @@
+buildscript {
+    ext {
+        springBootVersion = '2.3.2.RELEASE'
+        springBootAdminVersion = '2.1.5'
+        springCloudVersion = 'Hoxton.SR5'
+        feignReactorVersion = '2.0.15'
+    }
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: "org.springframework.boot"
+apply plugin: 'io.spring.dependency-management'
+
+group 'com.stream.web'
+version '1.0.0'
+
+
+sourceCompatibility = 13
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+javadoc.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test) {
+    systemProperty "file.encoding", "UTF-8"
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-actuator')
+    implementation('org.springframework.boot:spring-boot-starter-webflux')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('io.projectreactor:reactor-test')
+
+    //lombok
+    implementation('org.projectlombok:lombok:1.18.12')
+    annotationProcessor('org.projectlombok:lombok:1.18.12')
+
+    //    Spring cloud
+    implementation('org.springframework.cloud:spring-cloud-starter-consul-discovery')
+//    implementation('org.springframework.cloud:spring-cloud-starter-config')
+    implementation("com.playtika.reactivefeign:feign-reactor-webclient:${feignReactorVersion}")
+    implementation("com.playtika.reactivefeign:feign-reactor-cloud:${feignReactorVersion}")
+    implementation("com.playtika.reactivefeign:feign-reactor-spring-configuration:${feignReactorVersion}")
+//    implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
+}
+
+test {
+    exclude 'com/**'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
