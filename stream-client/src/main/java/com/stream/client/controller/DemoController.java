@@ -62,8 +62,8 @@ public class DemoController {
     }
 
     @GetMapping(value = "/mono_ex")
-    public Mono<IntegrationRes<String>> testMonoEx(){
-        return demoWebClient.monoEx();
+    public Mono<IntegrationRes<String>> testMono(){
+        return demoWebClient.mono();
     }
 
 
