@@ -51,6 +51,7 @@ repositories {
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('org.springframework.boot:spring-boot-starter-webflux')
+    implementation('org.springframework.boot:spring-boot-starter-amqp')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('io.projectreactor:reactor-test')
 
@@ -64,6 +65,7 @@ dependencies {
     implementation("com.playtika.reactivefeign:feign-reactor-webclient:${feignReactorVersion}")
     implementation("com.playtika.reactivefeign:feign-reactor-cloud:${feignReactorVersion}")
     implementation("com.playtika.reactivefeign:feign-reactor-spring-configuration:${feignReactorVersion}")
+    implementation('org.springframework.cloud:spring-cloud-starter-bus-amqp')
 //    implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
 //      common
     compile('com.stream.common:stream-common:1.0.0')
