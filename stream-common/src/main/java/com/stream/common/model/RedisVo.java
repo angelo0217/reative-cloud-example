@@ -3,9 +3,10 @@ package com.stream.common.model;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
-public class UserVo implements Serializable {
+public class RedisVo implements Serializable {
     private String name;
-    private int age;
+    private BigDecimal age;
 }
