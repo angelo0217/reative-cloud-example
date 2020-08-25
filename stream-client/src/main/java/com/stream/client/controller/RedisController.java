@@ -4,7 +4,9 @@ import com.stream.client.service.CacheService;
 import com.stream.common.model.RedisVo;
 import com.stream.common.model.UserVo;
 import com.stream.common.util.JsonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ReactiveListOperations;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +15,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Map;
 
+@Slf4j
 @RestController
 public class RedisController {
 
@@ -41,7 +45,7 @@ public class RedisController {
     }
 
     @GetMapping("testRedis1")
-    public void findCityById() {
+    public void testRedis1() {
         Mono mono1 = reactiveRedisTemplate.opsForValue().set("c", "vvvv");
         mono1.subscribe(System.out::println);
 
@@ -61,18 +65,18 @@ public class RedisController {
     }
 
     @GetMapping("/testRedis2")
-    public Mono<String> testReactorRedis2() {
+    public Mono<String> testRedis2() {
         Mono mono = reactiveRedisTemplate.opsForValue().get("a");
         return mono;
     }
 
     @GetMapping("/testRedis3")
-    public Mono<RedisVo> testReactorRedis3() {
+    public Mono<RedisVo> testRedis3() {
         return reactiveRedisTemplate.opsForValue().get("b");
     }
 
     @GetMapping("/testRedis4")
-    public Flux<Object> testReactorRedis4() {
+    public Flux<Object> testRedis4() {
         Flux flux = Flux.just("a", "b", "c")
                 .flatMap(s -> reactiveRedisTemplate.opsForValue().get(s));
         flux.subscribe(System.out::println);
@@ -81,10 +85,24 @@ public class RedisController {
 
 
     @GetMapping("/testRedis5")
-    public Map testReactorRedis5() {
+    public Map testRedis5() {
         Mono monoA = reactiveRedisTemplate.opsForValue().get("a");
         Mono monoC = reactiveRedisTemplate.opsForValue().get("c");
         return Map.of("monoA", monoA, "monoC", monoC);
+    }
+
+    @GetMapping("testList")
+    public void testList() {
+        for(int i = 0; i < 10; i++) {
+            Mono mono = reactiveRedisTemplate.opsForList().leftPush("redis_list", i);
+            mono.subscribe((val)-> log.debug("push data {}", val));
+        }
+    }
+
+    @GetMapping("/getRedisList")
+    public Flux<Integer> getRedisList() {
+        Flux<Integer> flux = reactiveRedisTemplate.opsForList().range("redis_list", 0, -1);
+        return flux.delayElements(Duration.ofMillis(100));
     }
 
     @GetMapping("/norRedis1")
