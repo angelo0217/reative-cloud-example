@@ -1,4 +1,4 @@
-package com.stream.client.protocol;
+package com.stream.client.integration;
 
 import feign.Request;
 import org.springframework.context.annotation.Bean;

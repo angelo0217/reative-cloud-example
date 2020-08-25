@@ -65,6 +65,8 @@ dependencies {
     implementation("com.playtika.reactivefeign:feign-reactor-cloud:${feignReactorVersion}")
     implementation("com.playtika.reactivefeign:feign-reactor-spring-configuration:${feignReactorVersion}")
 //    implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
+//      common
+    compile('com.stream.common:stream-common:1.0.0')
 }
 
 test {

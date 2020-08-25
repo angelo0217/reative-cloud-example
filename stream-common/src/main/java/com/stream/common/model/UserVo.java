@@ -1,4 +1,4 @@
-package com.stream.web.model;
+package com.stream.common.model;
 
 import lombok.Data;
 

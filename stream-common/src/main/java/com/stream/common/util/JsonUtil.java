@@ -1,4 +1,4 @@
-package com.stream.client.util;
+package com.stream.common.util;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;

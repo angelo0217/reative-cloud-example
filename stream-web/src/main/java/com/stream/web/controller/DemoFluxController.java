@@ -1,25 +1,23 @@
 package com.stream.web.controller;
 
+import com.stream.common.model.UserVo;
+import com.stream.common.protocol.WebFluxProtocol;
 import com.stream.web.exception.WebFluxException;
-import com.stream.web.model.IntegrationRes;
-import com.stream.web.model.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 @Slf4j
 @RestController
-public class DemoController {
+public class DemoFluxController implements WebFluxProtocol {
 
     @GetMapping(value = "/flux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> flux() {
@@ -72,10 +70,4 @@ public class DemoController {
         return result;
     }
 
-    @GetMapping(value = "/mono")
-    public Mono<IntegrationRes<String>> mono() {
-        IntegrationRes integrationRes = new IntegrationRes();
-        integrationRes.setData("test");
-        return Mono.just(integrationRes);
-    }
 }

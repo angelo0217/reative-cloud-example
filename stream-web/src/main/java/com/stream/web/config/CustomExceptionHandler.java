@@ -1,8 +1,8 @@
 package com.stream.web.config;
 
 
+import com.stream.common.model.ReactiveWebRes;
 import com.stream.web.exception.WebFluxException;
-import com.stream.web.model.IntegrationRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,10 +21,10 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(code = HttpStatus.PRECONDITION_FAILED)
-    public Mono<IntegrationRes> handleCustomException(Exception e) {
+    public Mono<ReactiveWebRes> handleCustomException(Exception e) {
         log.error("error === ", e);
-        IntegrationRes integrationRes = new IntegrationRes(999, "111 test error", null);
-        return Mono.just(integrationRes);
+        ReactiveWebRes reactiveWebRes = new ReactiveWebRes(999, "111 test error", null);
+        return Mono.just(reactiveWebRes);
     }
 
 }
