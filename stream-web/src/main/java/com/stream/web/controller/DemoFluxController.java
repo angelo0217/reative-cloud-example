@@ -65,7 +65,10 @@ public class DemoFluxController implements WebFluxProtocol {
                 throw new WebFluxException("test error");
             }
             return "flux data—" + i;
-        })).delayElements(Duration.ofMillis(1000)).onErrorStop();
+        })).delayElements(Duration.ofMillis(1000))
+//            .onErrorMap(ex -> new WebFluxException("test error2"));
+//           .doOnError(ex -> log.info("error !!!", ex))
+                .onErrorReturn("flux data—" +Integer.MAX_VALUE)
         ;
         return result;
     }
