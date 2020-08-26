@@ -2,7 +2,7 @@ package com.stream.web.controller;
 
 import com.stream.common.model.UserVo;
 import com.stream.common.protocol.WebFluxProtocol;
-import com.stream.web.exception.WebFluxException;
+import com.stream.web.exception.WebDemoException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,7 +62,7 @@ public class DemoFluxController implements WebFluxProtocol {
     public Flux<String> fluxEx() {
         Flux<String> result = Flux.fromStream(IntStream.range(1, 5).mapToObj(i -> {
             if (i == 3) {
-                throw new WebFluxException("test error");
+                throw new WebDemoException("test error");
             }
             return "flux data—" + i;
         })).delayElements(Duration.ofMillis(1000))

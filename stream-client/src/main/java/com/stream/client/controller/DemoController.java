@@ -42,9 +42,14 @@ public class DemoController {
         return demoService.testEx();
     }
 
-    @GetMapping(value = "/mono_ex")
+    @GetMapping(value = "/mono")
     public Mono<ReactiveWebRes<String>> testMono(){
         return demoService.getWebMono();
+    }
+
+    @GetMapping(value = "/mono_ex")
+    public Mono<ReactiveWebRes<String>> testMonoEx(){
+        return demoService.getWebMonoEx();
     }
 
 

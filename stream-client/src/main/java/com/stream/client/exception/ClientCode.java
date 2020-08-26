@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum ClientCode {
     SUCCESS(0, "success"),
     REST_INTEGRATION_ERROR(990, "rest error"),
+    HYSTRIX_ERROR(991, "Hystrix error"),
     SYSTEM_ERROR(999, "system_error");
 
     private int code;

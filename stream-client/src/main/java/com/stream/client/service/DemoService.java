@@ -82,4 +82,8 @@ public class DemoService {
     public Mono<ReactiveWebRes<String>> getWebMono(){
         return demoMonoClient.mono();
     }
+
+    public Mono<ReactiveWebRes<String>> getWebMonoEx(){
+        return demoMonoClient.monoEx();
+    }
 }

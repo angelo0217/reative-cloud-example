@@ -2,7 +2,7 @@ package com.stream.web.config;
 
 
 import com.stream.common.model.ReactiveWebRes;
-import com.stream.web.exception.WebFluxException;
+import com.stream.web.exception.WebDemoException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,9 +14,12 @@ import reactor.core.publisher.Mono;
 @RestControllerAdvice(basePackages="com.stream.web.controller")
 public class CustomExceptionHandler {
 
-    @ExceptionHandler(WebFluxException.class)
-    public void handleWebFluxException(WebFluxException webFluxException) {
-        log.error("webFluxException === ", webFluxException);
+    @ExceptionHandler(WebDemoException.class)
+    @ResponseStatus(code = HttpStatus.PRECONDITION_FAILED)
+    public Mono<ReactiveWebRes> handleWebFluxException(WebDemoException webDemoException) {
+        ReactiveWebRes reactiveWebRes = new ReactiveWebRes(111, webDemoException.getMessage(), null);
+        log.error("webFluxException === ", webDemoException);
+        return Mono.just(reactiveWebRes);
     }
 
     @ExceptionHandler(Exception.class)

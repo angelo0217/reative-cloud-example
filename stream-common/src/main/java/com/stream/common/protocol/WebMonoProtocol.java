@@ -9,4 +9,7 @@ public interface WebMonoProtocol {
 
     @GetMapping(value = "/mono")
     Mono<ReactiveWebRes<String>> mono();
+
+    @GetMapping(value = "/mono_ex")
+    Mono<ReactiveWebRes<String>> monoEx();
 }
