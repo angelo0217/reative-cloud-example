@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 public class FeignErrorDecoder implements ErrorDecoder {
     @Override
     public Exception decode(String methodKey, Response response) {
-        log.debug("in the decode =======");
         ReactiveWebRes reactiveWebRes = JsonUtil.jsonToObject(response.body().toString(), ReactiveWebRes.class);
         log.error("integration methodKey: {}", methodKey );
         log.error("integration Status code: {}, info: {}", response.status(), response.request().toString());

@@ -30,8 +30,12 @@ public class CustomExceptionHandler {
     @ExceptionHandler(DemoClientException.class)
     @ResponseStatus(code = HttpStatus.PRECONDITION_FAILED)
     public Mono<ReactiveWebRes> handleDemoClientException(DemoClientException e) {
-        log.error("demo error === ", e);
-        ReactiveWebRes reactiveWebRes= new ReactiveWebRes(e.getClientCode().getCode(), e.getClientCode().getMessage(), null);
+        if(e.getException() != null){
+            log.error("demo error {}, ", e.getClientCode(), e.getException());
+        } else {
+            log.error("demo define error {} ", e.getClientCode());
+        }
+        ReactiveWebRes reactiveWebRes= new ReactiveWebRes(e.getClientCode().getCode(), e.getMessage(), null);
         return Mono.just(reactiveWebRes);
     }
 
