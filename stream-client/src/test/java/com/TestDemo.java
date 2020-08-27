@@ -58,4 +58,17 @@ public class TestDemo {
 //                .toStream()
 //                .forEach(System.out::println);
     }
+
+    @Test
+    public void test5(){
+        Flux<String> flux1 = Flux.just("a", "b", "c", "d", "e");
+        Flux<String> flux2 = Flux.just("A", "B", "C", "D");
+        Flux<String> flux3 = Flux.just("1", "2", "3", "4", "5");
+
+        flux1.zipWith(flux2).subscribe(System.out::println);
+
+
+
+    }
 }
+
