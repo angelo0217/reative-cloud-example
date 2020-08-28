@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 @RestController
 public class DemoMonoController implements WebMonoProtocol {
 
-    @GetMapping(value = "/mono")
+    @Override
     public Mono<ReactiveWebRes<String>> mono() {
         ReactiveWebRes reactiveWebRes = new ReactiveWebRes();
         reactiveWebRes.setData("test");

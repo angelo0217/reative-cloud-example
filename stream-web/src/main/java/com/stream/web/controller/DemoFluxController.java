@@ -4,7 +4,6 @@ import com.stream.common.model.UserVo;
 import com.stream.common.protocol.WebFluxProtocol;
 import com.stream.web.exception.WebDemoException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -19,7 +18,7 @@ import java.util.stream.IntStream;
 @RestController
 public class DemoFluxController implements WebFluxProtocol {
 
-    @GetMapping(value = "/flux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/flux")
     public Flux<String> flux() {
         long timeMillis = System.currentTimeMillis();
         log.info("webflux() start");
@@ -35,8 +34,7 @@ public class DemoFluxController implements WebFluxProtocol {
         return result;
     }
 
-
-    @GetMapping(value = "/users", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Override
     public Flux<UserVo> users() {
         Flux<UserVo> objectFlux = Flux.fromIterable(getUsers()).map(value -> {
             value.setName("name:" + value.getName());
@@ -58,7 +56,7 @@ public class DemoFluxController implements WebFluxProtocol {
         return list;
     }
 
-    @GetMapping(value = "/flux_ex", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Override
     public Flux<String> fluxEx() {
         Flux<String> result = Flux.fromStream(IntStream.range(1, 5).mapToObj(i -> {
             if (i == 3) {
@@ -66,9 +64,9 @@ public class DemoFluxController implements WebFluxProtocol {
             }
             return "flux data—" + i;
         })).delayElements(Duration.ofMillis(1000))
-//            .onErrorMap(ex -> new WebFluxException("test error2"));
-//           .doOnError(ex -> log.info("error !!!", ex))
-                .onErrorReturn("flux data—" +Integer.MAX_VALUE)
+//            .onErrorMap(ex -> new RuntimeException("test error2"));
+           .doOnError(ex -> log.info("error !!!", ex))
+//                .onErrorReturn("flux data—" +Integer.MAX_VALUE)
         ;
         return result;
     }

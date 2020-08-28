@@ -39,7 +39,10 @@ public class DemoController {
 
     @GetMapping(value = "/flux_ex", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> testEx(){
-        return demoService.testEx();
+        return demoService.testEx().map((val) ->{
+            System.out.println("~~~~~~~~~" + val);
+            return val;
+        });
     }
 
     @GetMapping(value = "/mono")
