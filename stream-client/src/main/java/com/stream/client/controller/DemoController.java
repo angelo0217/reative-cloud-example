@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,7 +34,8 @@ public class DemoController {
     }
 
     @GetMapping(value = "/users", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<UserVo> getWebUser(){
+    public Flux<UserVo> getWebUser(@RequestParam("id") String id){
+        log.info(">>>>>>>>>>>" + id);
         return demoService.getWebUser();
     }
 

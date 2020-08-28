@@ -65,7 +65,7 @@ public class DemoService {
     }
 
     public Flux<UserVo> getWebUser(){
-        return demoFluxClient.users();
+        return demoFluxClient.users().delayElements(Duration.ofMillis(1000));
     }
 
     public Flux<String> testEx() {
