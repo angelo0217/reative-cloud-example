@@ -13,7 +13,7 @@ public class SingleEventProcessor extends EventProcessor {
         super(eventListener);
     }
     @Override
-    public void processComplete() {
+    public void executeLogic() {
         this.getEventListener().onDataChunk("" + System.currentTimeMillis());
     }
 }

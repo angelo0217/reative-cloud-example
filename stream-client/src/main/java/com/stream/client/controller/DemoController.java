@@ -77,7 +77,7 @@ public class DemoController {
 
     @GetMapping("/add")
     public void addData() {
-        eventProcessorManger.getEventProcessor("test").processComplete();
+        eventProcessorManger.getEventProcessor("test").executeLogic();
     }
 
     @GetMapping("/get_queue")
