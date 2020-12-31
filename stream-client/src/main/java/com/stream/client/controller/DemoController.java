@@ -22,6 +22,14 @@ public class DemoController {
 
     @Autowired
     private DemoService demoService;
+
+    @Autowired
+    private BeanFactory beanFactory;
+
+    @Autowired
+    private EventProcessorManger eventProcessorManger;
+
+
     @GetMapping(value = "/flux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> flux() {
         return demoService.flux();
@@ -38,55 +46,48 @@ public class DemoController {
     }
 
     @GetMapping(value = "/users", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<UserVo> getWebUser(@RequestParam("id") String id){
+    public Flux<UserVo> getWebUser(@RequestParam("id") String id) {
         log.info(">>>>>>>>>>>" + id);
         return demoService.getWebUser();
     }
 
     @GetMapping(value = "/flux_ex", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> testEx(){
-        return demoService.testEx().map((val) ->{
+    public Flux<String> testEx() {
+        return demoService.testEx().map((val) -> {
             System.out.println("~~~~~~~~~" + val);
             return val;
         });
     }
 
     @GetMapping(value = "/mono")
-    public Mono<ReactiveWebRes<String>> testMono(){
+    public Mono<ReactiveWebRes<String>> testMono() {
         return demoService.getWebMono();
     }
 
     @GetMapping(value = "/mono_ex")
-    public Mono<ReactiveWebRes<String>> testMonoEx(){
+    public Mono<ReactiveWebRes<String>> testMonoEx() {
         return demoService.getWebMonoEx();
     }
 
 
     @GetMapping(value = "/client_change", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> clientChange(){
+    public Flux<String> clientChange() {
         return demoService.testWebFlux();
     }
 
-    @Autowired
-    private EventProcessorManger eventProcessorManger;
-
-
     @GetMapping("/add")
-    public void addData(){
+    public void addData() {
         eventProcessorManger.getEventProcessor("test").processComplete();
     }
 
-    @Autowired
-    private BeanFactory beanFactory;
-
     @GetMapping("/get_queue")
-    public Flux<String> getQueue(){
+    public Flux<String> getQueue() {
         EventListener eventListener = beanFactory.getBean(EventListener.class);
         SingleEventProcessor singleEventProcessor = beanFactory.getBean(SingleEventProcessor.class, eventListener);
         singleEventProcessor.getEventListener().setEventProcessor(singleEventProcessor);
 
         eventProcessorManger.saveEventProcessor("test", singleEventProcessor);
-        return Flux.create(sink->{
+        return Flux.create(sink -> {
             singleEventProcessor.getEventListener().setSink(sink);
         });
     }
