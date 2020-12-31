@@ -1,9 +1,13 @@
 package com.stream.client.controller;
 
+import com.stream.client.reactive.EventListener;
+import com.stream.client.reactive.EventProcessorManger;
+import com.stream.client.reactive.SingleEventProcessor;
 import com.stream.client.service.DemoService;
 import com.stream.common.model.ReactiveWebRes;
 import com.stream.common.model.UserVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,35 +67,27 @@ public class DemoController {
         return demoService.testWebFlux();
     }
 
+    @Autowired
+    private EventProcessorManger eventProcessorManger;
 
-    private SingleEventProcessor singleEventProcessor = new SingleEventProcessor();
 
     @GetMapping("/add")
     public void addData(){
-        singleEventProcessor.processComplete();
+        eventProcessorManger.getEventProcessor("test").processComplete();
     }
+
+    @Autowired
+    private BeanFactory beanFactory;
 
     @GetMapping("/get_queue")
     public Flux<String> getQueue(){
+        EventListener eventListener = beanFactory.getBean(EventListener.class);
+        SingleEventProcessor singleEventProcessor = beanFactory.getBean(SingleEventProcessor.class, eventListener);
+        singleEventProcessor.getEventListener().setEventProcessor(singleEventProcessor);
+
+        eventProcessorManger.saveEventProcessor("test", singleEventProcessor);
         return Flux.create(sink->{
-            singleEventProcessor.register(new EventListener<String>() {
-                @Override
-                public void onDataChunk(String chunk) {
-                    log.info("data: {}, cancel: {}", chunk, sink.isCancelled());
-                    if(sink.isCancelled()){
-                        sink.complete();
-                        singleEventProcessor.shutdown();
-                    } else {
-                        sink.next(chunk);
-                    }
-                }
-                @Override
-                public void processComplete() {
-                    log.info("complete");
-                    sink.complete();
-                    singleEventProcessor.shutdown();
-                }
-            });
+            singleEventProcessor.getEventListener().setSink(sink);
         });
     }
 }
