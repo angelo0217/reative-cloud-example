@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+
 @Slf4j
 @RestController
 public class DemoController {
@@ -61,5 +65,39 @@ public class DemoController {
     @GetMapping(value = "/client_change", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> clientChange(){
         return demoService.testWebFlux();
+    }
+
+    private BlockingQueue<String> queue = new ArrayBlockingQueue(100000);
+
+    private SingleEventProcessor singleEventProcessor = new SingleEventProcessor();
+
+    @GetMapping("/add")
+    public void addData(){
+//        queue.add("" + System.currentTimeMillis());
+        singleEventProcessor.processComplete();
+    }
+
+    @GetMapping("/get_queue")
+    public Flux<String> getQueue(){
+        return Flux.create(sink->{
+            singleEventProcessor.register(new EventListener<String>() {
+                @Override
+                public void onDataChunk(String chunk) {
+                    log.info("data: {}, cancel: {}", chunk, sink.isCancelled());
+                    if(sink.isCancelled()){
+                        sink.complete();
+                        singleEventProcessor.shutdown();
+                    } else {
+                        sink.next(chunk);
+                    }
+                }
+                @Override
+                public void processComplete() {
+                    log.info("complete");
+                    sink.complete();
+                    singleEventProcessor.shutdown();
+                }
+            });
+        });
     }
 }
