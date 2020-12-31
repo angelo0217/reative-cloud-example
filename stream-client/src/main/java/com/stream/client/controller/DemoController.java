@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
 @Slf4j
 @RestController
 public class DemoController {
@@ -67,13 +63,11 @@ public class DemoController {
         return demoService.testWebFlux();
     }
 
-    private BlockingQueue<String> queue = new ArrayBlockingQueue(100000);
 
     private SingleEventProcessor singleEventProcessor = new SingleEventProcessor();
 
     @GetMapping("/add")
     public void addData(){
-//        queue.add("" + System.currentTimeMillis());
         singleEventProcessor.processComplete();
     }
 
