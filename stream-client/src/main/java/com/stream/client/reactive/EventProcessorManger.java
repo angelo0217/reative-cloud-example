@@ -42,6 +42,7 @@ public class EventProcessorManger {
         EventProcessor eventProcessor = eventProcessorMap.get(key);
         if(eventProcessor != null){
             eventProcessor.shutdown();
+            eventProcessorMap.remove(this.genKey(type, key));
         }
 
         List<String> typeKeys = typeListMap.get(type);
