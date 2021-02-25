@@ -1,20 +1,21 @@
 package com.stream.client.controller;
 
-import com.stream.client.reactive.EventListener;
 import com.stream.client.reactive.EventProcessorManger;
-import com.stream.client.reactive.SingleEventProcessor;
 import com.stream.client.service.DemoService;
 import com.stream.common.model.ReactiveWebRes;
 import com.stream.common.model.UserVo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.io.Serializable;
+import java.time.Duration;
 
 @Slf4j
 @RestController
@@ -22,9 +23,6 @@ public class DemoController {
 
     @Autowired
     private DemoService demoService;
-
-    @Autowired
-    private BeanFactory beanFactory;
 
     @Autowired
     private EventProcessorManger eventProcessorManger;
@@ -75,25 +73,27 @@ public class DemoController {
         return demoService.testWebFlux();
     }
 
+    private static String TYPE = "type1";
+
+    private static String KEY = "test";
+
+    @GetMapping("/close")
+    public void close() {
+        eventProcessorManger.getListener(TYPE, KEY).processComplete();
+    }
+
     @GetMapping("/add")
     public void addData() {
-        eventProcessorManger.getEventProcessor("type1", "test").executeLogic("aaaaa");
+        eventProcessorManger.sendAllEventByTypeKey(TYPE, KEY, "aaaaa");
     }
 
     @GetMapping("/sendTpe")
     public void sendTpe() {
-        eventProcessorManger.sendAllEventByType("type1", "hello");
+        eventProcessorManger.sendAllEventByType(TYPE, "hello");
     }
 
     @GetMapping("/get_queue")
-    public Flux<String> getQueue() {
-        EventListener eventListener = beanFactory.getBean(EventListener.class);
-        SingleEventProcessor singleEventProcessor = beanFactory.getBean(SingleEventProcessor.class, eventListener);
-        singleEventProcessor.getEventListener().setEventProcessor(singleEventProcessor);
-
-        eventProcessorManger.saveEventProcessor("type1", "test", singleEventProcessor);
-        return Flux.create(sink -> {
-            singleEventProcessor.getEventListener().setSink(sink);
-        });
+    public Flux<ServerSentEvent<? extends Serializable>> getQueue() {
+        return eventProcessorManger.createEvent(TYPE, KEY);
     }
 }

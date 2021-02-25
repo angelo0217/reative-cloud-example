@@ -1,8 +1,15 @@
 package com.stream.client.reactive;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
+import java.io.Serializable;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -11,47 +18,70 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class EventProcessorManger {
 
-    private Map<String, EventProcessor> eventProcessorMap = new ConcurrentHashMap<>();
+    @Autowired
+    private BeanFactory beanFactory;
+
+    private Map<String, EventListener> eventListenerMap = new ConcurrentHashMap<>();
 
     private Map<String, List<String>> typeListMap = new ConcurrentHashMap<>();
 
-    public synchronized void saveEventProcessor(String type, String key, EventProcessor eventProcessor){
+    public Flux<ServerSentEvent<? extends Serializable>> createEvent(String type, String key){
+
+        Flux process = Flux.create(sink -> {
+            EventListener eventListener = beanFactory.getBean(EventListener.class, type, key, sink);
+            saveEventListener(type, key, eventListener);
+        });
+        Flux<ServerSentEvent<String>> ping = Flux.interval(Duration.ofSeconds(2)).map(l -> ServerSentEvent.builder("").event("ping").data("").build());
+
+        return Flux.merge(process, ping);
+    }
+
+    public synchronized void saveEventListener(String type, String key, EventListener eventListener){
         this.removeEventProcessor(type, key);
-        eventProcessorMap.put(this.genKey(type, key), eventProcessor);
+        eventListenerMap.put(this.genKey(type, key), eventListener);
+
         List<String> typeKeys = typeListMap.get(type);
         if(CollectionUtils.isEmpty(typeKeys)){
             typeKeys = new Vector<>();
         }
+
         typeKeys.add(key);
         typeListMap.put(type, typeKeys);
+    }
+
+    public EventListener getListener(String type, String key){
+        return eventListenerMap.get(this.genKey(type, key));
+    }
+
+    public void sendAllEventByTypeKey(String type, String key , String message){
+        EventListener eventListener  = eventListenerMap.get(this.genKey(type, key));
+        if(eventListener != null && eventListener.isLinked()){
+            eventListener.onDataChunk(message);
+        }
     }
 
     public void sendAllEventByType(String type, String message){
         List<String> typeKeys = typeListMap.get(type);
         if(!CollectionUtils.isEmpty(typeKeys)){
             typeKeys.forEach(key ->{
-                EventProcessor eventProcessor = eventProcessorMap.get(this.genKey(type, key));
-                if(eventProcessor != null){
-                    eventProcessor.executeLogic(message);
+                EventListener eventListener  = eventListenerMap.get(this.genKey(type, key));
+                if(eventListener != null && eventListener.isLinked()){
+                    eventListener.onDataChunk(message);
                 }
             });
         }
     }
 
     public synchronized void removeEventProcessor(String type,String key){
-        EventProcessor eventProcessor = eventProcessorMap.get(key);
-        if(eventProcessor != null){
-            eventProcessor.shutdown();
-            eventProcessorMap.remove(this.genKey(type, key));
+        EventListener eventListener = eventListenerMap.get(key);
+        if(eventListener != null){
+            eventListenerMap.remove(this.genKey(type, key));
         }
 
         List<String> typeKeys = typeListMap.get(type);
         if(!CollectionUtils.isEmpty(typeKeys)){
             typeKeys.remove(key);
         }
-    }
-    public EventProcessor getEventProcessor(String type, String key){
-        return eventProcessorMap.get(this.genKey(type, key));
     }
 
     private String genKey(String type, String key){
