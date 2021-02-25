@@ -12,7 +12,7 @@ public abstract class EventProcessor<T> {
         this.eventListener = eventListener;
     }
 
-    public abstract void executeLogic();
+    public abstract void executeLogic(String message);
 
     public void shutdown() {
         eventListener = null;

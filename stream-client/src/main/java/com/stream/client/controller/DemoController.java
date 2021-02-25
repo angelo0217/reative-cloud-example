@@ -77,7 +77,12 @@ public class DemoController {
 
     @GetMapping("/add")
     public void addData() {
-        eventProcessorManger.getEventProcessor("test").executeLogic();
+        eventProcessorManger.getEventProcessor("type1", "test").executeLogic("aaaaa");
+    }
+
+    @GetMapping("/sendTpe")
+    public void sendTpe() {
+        eventProcessorManger.sendAllEventByType("type1", "hello");
     }
 
     @GetMapping("/get_queue")
@@ -86,7 +91,7 @@ public class DemoController {
         SingleEventProcessor singleEventProcessor = beanFactory.getBean(SingleEventProcessor.class, eventListener);
         singleEventProcessor.getEventListener().setEventProcessor(singleEventProcessor);
 
-        eventProcessorManger.saveEventProcessor("test", singleEventProcessor);
+        eventProcessorManger.saveEventProcessor("type1", "test", singleEventProcessor);
         return Flux.create(sink -> {
             singleEventProcessor.getEventListener().setSink(sink);
         });
