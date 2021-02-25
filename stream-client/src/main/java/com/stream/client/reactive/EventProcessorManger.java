@@ -6,7 +6,6 @@ import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -32,7 +31,6 @@ public class EventProcessorManger {
             saveEventListener(type, key, eventListener);
         });
         Flux<ServerSentEvent<String>> ping = Flux.interval(Duration.ofSeconds(2)).map(l -> ServerSentEvent.builder("").event("ping").data("").build());
-
         return Flux.merge(process, ping);
     }
 

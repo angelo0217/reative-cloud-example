@@ -24,7 +24,6 @@ public class EventListener<T> {
     private String type;
     private String key;
     private FluxSink<T> sink;
-    private FluxSink<T> mainSink;
 
     @Autowired
     private EventProcessorManger eventProcessorManger;
@@ -40,7 +39,7 @@ public class EventListener<T> {
             }
         } else {
             //ServerSentEvent.builder(chunk).build()
-            sink.next(chunk);
+            sink.next((T) ServerSentEvent.builder(chunk).build());
         }
     }
 
@@ -56,5 +55,6 @@ public class EventListener<T> {
         sink.complete();
 //        mainSink.complete();
     }
+
 }
 

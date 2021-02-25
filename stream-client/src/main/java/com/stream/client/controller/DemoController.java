@@ -84,7 +84,7 @@ public class DemoController {
 
     @GetMapping("/add")
     public void addData() {
-        eventProcessorManger.sendAllEventByTypeKey(TYPE, KEY, "aaaaa");
+        eventProcessorManger.sendAllEventByTypeKey(TYPE, KEY, "aaaa");
     }
 
     @GetMapping("/sendTpe")
