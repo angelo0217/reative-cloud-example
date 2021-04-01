@@ -36,8 +36,34 @@ public class EventProcessorManger {
             return ServerSentEvent.builder(sse.data()).event("TEST").build();
         });
         
-        Flux<ServerSentEvent<String>> ping = Flux.interval(Duration.ofSeconds(2)).map(l -> ServerSentEvent.builder("").event("ping").data("").build());
-        return Flux.merge(process, ping);
+        Flux<ServerSentEvent<String>> ping = Flux.interval(Duration.ofSeconds(2)).map(l -> {
+            EventListener eventListener = this.getListener(type, key);
+            if(eventListener == null || eventListener.getTime() != time || !eventListener.isLinked()){
+                throw new RuntimeException("data link close");
+            }
+            return ServerSentEvent.builder("ping").event("ping").build();
+        }).onErrorStop();
+        
+        return Flux.merge(process, ping).doOnCancel(()->this.removeEventProcessor(type, key)).onErrorResume((e)-> Flux.empty());
+    }
+    
+    private void executeOldSse(String type, String key){
+        EventListener eventListener = this.getListener(type, key);
+        if(eventListener != null){
+            if(eventListener.isLinked()){
+                try{
+                    log.info("call close old sse {}, {}, ", type, key);
+
+                    this.sendAllEventByTypeKey(type, key, "close");
+                    eventListener.processComplete();
+                    Thread.sleep(3000);
+                } catch (Exception ex) {
+                    log.error("call close error {}, {}, ", type, key, ex);
+                }
+            } else {
+                this.removeEventProcessor(type, key);
+            }
+        }
     }
 
     public synchronized void saveEventListener(String type, String key, EventListener eventListener){
