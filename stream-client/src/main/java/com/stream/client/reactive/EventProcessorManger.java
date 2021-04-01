@@ -26,10 +26,16 @@ public class EventProcessorManger {
 
     public Flux<ServerSentEvent<? extends Serializable>> createEvent(String type, String key){
 
+
         Flux process = Flux.create(sink -> {
             EventListener eventListener = beanFactory.getBean(EventListener.class, type, key, sink);
             saveEventListener(type, key, eventListener);
+        }, FluxSink.OverflowStrategy.ERROR).map(data -> {
+            //如果要用預設  就不用這個map
+            ServerSentEvent sse = (ServerSentEvent) data;
+            return ServerSentEvent.builder(sse.data()).event("TEST").build();
         });
+        
         Flux<ServerSentEvent<String>> ping = Flux.interval(Duration.ofSeconds(2)).map(l -> ServerSentEvent.builder("").event("ping").data("").build());
         return Flux.merge(process, ping);
     }
