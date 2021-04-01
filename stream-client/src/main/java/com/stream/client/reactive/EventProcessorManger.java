@@ -51,21 +51,22 @@ public class EventProcessorManger {
         return eventListenerMap.get(this.genKey(type, key));
     }
 
-    public void sendAllEventByTypeKey(String type, String key , String message){
-        EventListener eventListener  = eventListenerMap.get(this.genKey(type, key));
-        if(eventListener != null && eventListener.isLinked()){
-            eventListener.onDataChunk(message);
+    public void sendAllEventByTypeKey(String type, String key, String message) {
+        EventListener eventListener = eventListenerMap.get(this.genKey(type, key));
+        if (eventListener != null) {
+            if (eventListener.isLinked()) {
+                eventListener.onDataChunk(message);
+            } else {
+                this.removeEventProcessor(type, key);
+            }
         }
     }
 
-    public void sendAllEventByType(String type, String message){
-        List<String> typeKeys = typeListMap.get(type);
-        if(!CollectionUtils.isEmpty(typeKeys)){
-            typeKeys.forEach(key ->{
-                EventListener eventListener  = eventListenerMap.get(this.genKey(type, key));
-                if(eventListener != null && eventListener.isLinked()){
-                    eventListener.onDataChunk(message);
-                }
+    public void sendAllEventByType(String type, String message) {
+        if (!CollectionUtils.isEmpty(typeListMap.get(type))) {
+            List<String> typeKeys = new Vector<>(typeListMap.get(type));
+            typeKeys.forEach(key -> {
+                this.sendAllEventByTypeKey(type, key, message);
             });
         }
     }
